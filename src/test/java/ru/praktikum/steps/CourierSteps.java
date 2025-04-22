@@ -61,4 +61,10 @@ public class CourierSteps {
                 .statusCode(HttpStatus.SC_NOT_FOUND)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
+    @Step("Проверить ошибку при отсутствии обязательного поля при входе")
+    public void verifyMissingFieldInLoginError(Response response) {
+        response.then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .body("message", equalTo("Недостаточно данных для входа"));
+    }
 }

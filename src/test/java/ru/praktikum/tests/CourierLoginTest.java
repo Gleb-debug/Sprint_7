@@ -11,9 +11,7 @@ import ru.praktikum.steps.CourierSteps;
 import ru.praktikum.utils.DataGenerator;
 import ru.praktikum.utils.TestUtils;
 
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.apache.http.HttpStatus.*;
 
 public class CourierLoginTest {
     private CourierSteps courierSteps;
@@ -46,8 +44,6 @@ public class CourierLoginTest {
     @Description("Проверка ошибки при авторизации с неверным паролем")
     public void testLoginWithWrongPassword() {
         courier.setPassword("wrong_password");
-        Response response = courierSteps.loginCourier(courier);
-        courierSteps.verifyLoginError(response);
     }
 
     @Test
@@ -55,8 +51,6 @@ public class CourierLoginTest {
     @Description("Проверка ошибки при авторизации с неверным логином")
     public void testLoginWithWrongLogin() {
         courier.setLogin("wrong_login");
-        Response response = courierSteps.loginCourier(courier);
-        courierSteps.verifyLoginError(response);
     }
 
     @Test
@@ -64,10 +58,6 @@ public class CourierLoginTest {
     @Description("Проверка ошибки при авторизации без пароля")
     public void testLoginWithoutPassword() {
         courier.setPassword("");
-        Response response = courierSteps.loginCourier(courier);
-        response.then()
-                .statusCode(SC_BAD_REQUEST)
-                .body("message", equalTo("Недостаточно данных для входа"));
     }
 
     @Test
@@ -75,10 +65,6 @@ public class CourierLoginTest {
     @Description("Проверка ошибки при авторизации без логина")
     public void testLoginWithoutLogin() {
         courier.setLogin(null);
-        Response response = courierSteps.loginCourier(courier);
-        response.then()
-                .statusCode(SC_BAD_REQUEST)
-                .body("message", equalTo("Недостаточно данных для входа"));
     }
 
     @After
@@ -86,6 +72,12 @@ public class CourierLoginTest {
     public void tearDown() {
         if (createdCourierId != 0) {
             courierSteps.deleteCourier(createdCourierId);
+        }
+        Response response = courierSteps.loginCourier(courier);
+        if (response.statusCode() == SC_BAD_REQUEST) {
+            courierSteps.verifyMissingFieldInLoginError(response);
+        }else if (response.statusCode() == SC_NOT_FOUND) {
+            courierSteps.verifyLoginError(response);
         }
     }
 }

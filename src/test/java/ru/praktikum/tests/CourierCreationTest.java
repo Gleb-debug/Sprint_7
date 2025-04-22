@@ -30,9 +30,6 @@ public class CourierCreationTest {
     public void testCreateCourierSuccess() {
         Response createResponse = courierSteps.createCourier(courier);
         courierSteps.verifyCreationSuccess(createResponse);
-
-        Response loginResponse = courierSteps.loginCourier(courier);
-        createdCourierId = courierSteps.verifyLoginSuccess(loginResponse);
     }
 
     @Test
@@ -42,9 +39,6 @@ public class CourierCreationTest {
         courier.setFirstName(null);
         Response createResponse = courierSteps.createCourier(courier);
         courierSteps.verifyCreationSuccess(createResponse);
-
-        Response loginResponse = courierSteps.loginCourier(courier);
-        createdCourierId = courierSteps.verifyLoginSuccess(loginResponse);
     }
 
     @Test
@@ -52,9 +46,6 @@ public class CourierCreationTest {
     @Description("Проверка ошибки при создании курьера с существующим логином")
     public void testCreateDuplicateCourier() {
         courierSteps.createCourier(courier);
-        Response loginResponse = courierSteps.loginCourier(courier);
-        createdCourierId = courierSteps.verifyLoginSuccess(loginResponse);
-
         Response duplicateResponse = courierSteps.createCourier(courier);
         courierSteps.verifyDuplicateError(duplicateResponse);
     }
@@ -64,8 +55,6 @@ public class CourierCreationTest {
     @Description("Проверка ошибки при создании курьера без обязательного поля login")
     public void testCreateCourierWithoutLogin() {
         courier.setLogin(null);
-        Response response = courierSteps.createCourier(courier);
-        courierSteps.verifyMissingFieldError(response);
     }
 
     @Test
@@ -73,8 +62,6 @@ public class CourierCreationTest {
     @Description("Проверка ошибки при создании курьера без обязательного поля password")
     public void testCreateCourierWithoutPassword() {
         courier.setPassword(null);
-        Response response = courierSteps.createCourier(courier);
-        courierSteps.verifyMissingFieldError(response);
     }
 
     @After
@@ -82,6 +69,13 @@ public class CourierCreationTest {
     public void tearDown() {
         if (createdCourierId != 0) {
             courierSteps.deleteCourier(createdCourierId);
+        }
+        if (courier.getLogin() == null|| courier.getPassword() == null) {
+            Response response = courierSteps.createCourier(courier);
+            courierSteps.verifyMissingFieldError(response);
+        }else {
+            Response loginResponse = courierSteps.loginCourier(courier);
+            createdCourierId = courierSteps.verifyLoginSuccess(loginResponse);
         }
     }
 }

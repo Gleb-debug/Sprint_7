@@ -3,6 +3,7 @@ package ru.praktikum.tests;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import java.util.List;
 public class OrderCreationTest {
     private OrderSteps orderSteps;
     private final List<String> colors;
+    private Integer track;
 
     public OrderCreationTest(List<String> colors, String description) {
         this.colors = colors;
@@ -46,5 +48,11 @@ public class OrderCreationTest {
         Order order = DataGenerator.randomOrder(colors);
         Response response = orderSteps.createOrder(order);
         orderSteps.verifyCreationSuccess(response);
+        track = response.then().extract().body().jsonPath().get("track");
+    }
+
+    @After
+    public void tearDown() {
+        orderSteps.cancelOrder(track);
     }
 }

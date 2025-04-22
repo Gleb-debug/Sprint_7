@@ -35,4 +35,8 @@ public class OrderSteps {
                 .body("orders", notNullValue())
                 .body("orders.size()", greaterThan(0));
     }
+    @Step("Отменить заказ по trackId")
+    public Response cancelOrder(int trackId) {
+        return client.cancelOrder(trackId);
+    }
 }

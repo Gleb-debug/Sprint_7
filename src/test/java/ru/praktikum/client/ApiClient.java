@@ -21,4 +21,11 @@ public class ApiClient {
         return given()
                 .delete(path);
     }
+
+    protected Response put(String path, Object body) {
+        return given()
+                .header("Content-Type","application/json")
+                .body(body)
+                .put(path);
+    }
 }
